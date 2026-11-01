@@ -1,0 +1,11 @@
+# Data (provided by OpenClassrooms, too large)
+data/*
+!data/README.md
+
+# Python and Jupyter
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+
+# macOS
+.DS_Store
