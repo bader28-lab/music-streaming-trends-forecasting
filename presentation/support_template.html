@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tendances du streaming musical : soutenance P9</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME "STUDIO" : modifier ces variables suffit a changer l'apparence
+   =========================================== */
+:root {
+    --dark: #0d1321;
+    --light: #f5f6f8;
+    --white: #ffffff;
+    --accent: #3a6ff7;
+    --amber: #f2a541;
+    --muted: #8b93a7;
+    --ink: #0d1321;
+    --font: 'Manrope', sans-serif;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================
+   VIEWPORT FITTING : base obligatoire (viewport-base.css)
+   =========================================== */
+html, body { height: 100%; overflow-x: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+.slide {
+    width: 100vw; height: 100vh; height: 100dvh;
+    overflow: hidden; scroll-snap-align: start;
+    display: flex; flex-direction: column; position: relative;
+}
+.slide-content {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    max-height: 100%; overflow: hidden; padding: var(--slide-padding);
+}
+:root {
+    --title-size: clamp(1.5rem, 5vw, 4rem);
+    --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    --h3-size: clamp(1.1rem, 2.7vw, 1.9rem);
+    --body-size: clamp(0.9rem, 1.8vw, 1.35rem);
+    --small-size: clamp(0.8rem, 1.3vw, 1.1rem);
+    --slide-padding: clamp(1rem, 4vw, 4rem);
+    --content-gap: clamp(0.5rem, 2vw, 2rem);
+    --element-gap: clamp(0.25rem, 1vw, 1rem);
+}
+.card, .container, .content-box { max-width: min(90vw, 1000px); max-height: min(80vh, 700px); }
+.feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+.feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: clamp(0.5rem, 1.5vw, 1rem); }
+img, .image-container { max-width: 100%; max-height: min(50vh, 400px); object-fit: contain; }
+@media (max-height: 700px) {
+    :root { --slide-padding: clamp(0.75rem, 3vw, 2rem); --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+            --title-size: clamp(1.25rem, 4.5vw, 2.5rem); --h2-size: clamp(1rem, 3vw, 1.75rem); }
+}
+@media (max-height: 600px) {
+    :root { --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem); --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+            --title-size: clamp(1.1rem, 4vw, 2rem); --body-size: clamp(0.7rem, 1.2vw, 0.95rem); }
+    .nav-dots, .keyboard-hint, .decorative { display: none; }
+}
+@media (max-height: 500px) {
+    :root { --slide-padding: clamp(0.4rem, 2vw, 1rem); --title-size: clamp(1rem, 3.5vw, 1.5rem);
+            --h2-size: clamp(0.9rem, 2.5vw, 1.25rem); --body-size: clamp(0.65rem, 1vw, 0.85rem); }
+}
+@media (max-width: 600px) {
+    :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+    .grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+    html { scroll-behavior: auto; }
+}
+
+/* ===========================================
+   BASE
+   =========================================== */
+body { font-family: var(--font); background: var(--dark); color: var(--ink); }
+
+/* Barre de progression en haut de l'ecran */
+.progress-bar { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 100; transition: width .3s ease; }
+
+/* ===========================================
+   SLIDE EN DEUX PANNEAUX : sombre a gauche, clair a droite
+   =========================================== */
+.split { display: grid; grid-template-columns: 5fr 8fr; }
+.split .left {
+    background: var(--dark); color: var(--white); position: relative;
+    padding: var(--slide-padding); display: flex; flex-direction: column;
+    justify-content: space-between; gap: var(--element-gap); overflow: hidden;
+}
+/* Barre d'accent sur le bord du panneau sombre */
+.split .left::after { content: ""; position: absolute; right: 0; top: 15%; bottom: 15%; width: 5px; background: var(--accent); }
+.split .right {
+    background: var(--light); padding: var(--slide-padding);
+    padding-bottom: clamp(2rem, 6vh, 3.5rem);
+    display: flex; flex-direction: column; justify-content: center;
+    gap: clamp(0.5rem, 2vh, 1.25rem); overflow: hidden; min-height: 0;
+}
+
+.kicker { font-weight: 700; font-size: var(--small-size); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.big { font-weight: 800; font-size: clamp(3rem, 10vw, 8rem); line-height: .85; letter-spacing: -.04em; }
+.big.amber { color: var(--amber); }
+.big.sm { font-size: clamp(2.4rem, 6.5vw, 5.4rem); }
+.big-caption { font-size: var(--small-size); font-weight: 500; color: var(--muted); margin-top: clamp(.5rem, 1.5vh, 1rem); line-height: 1.45; max-width: 30ch; }
+
+/* Points cles du panneau sombre */
+.points { list-style: none; display: flex; flex-direction: column; gap: clamp(.35rem, 1.2vh, .8rem); }
+.points li { font-size: var(--small-size); line-height: 1.45; color: #c9cfdc; padding-left: 1rem; position: relative; }
+.points li::before { content: ""; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; background: var(--accent); }
+.points b { color: var(--white); }
+
+h1 { font-weight: 800; font-size: clamp(1.3rem, 3vw, 2.6rem); line-height: 1.1; letter-spacing: -.02em; }
+h2 { font-weight: 800; font-size: var(--h2-size); line-height: 1.12; letter-spacing: -.02em; }
+
+/* Zone graphique Plotly : hauteur bornee pour tenir dans l'ecran */
+.chart { width: 100%; height: min(58vh, 560px); min-height: 0; }
+.chart.tall { height: min(66vh, 640px); }
+.source { font-size: clamp(.72rem, 1vw, .9rem); color: var(--muted); }
+
+/* Encadres de chiffres ou de messages */
+.cards { display: grid; gap: clamp(.5rem, 1.5vw, 1rem); }
+.cards.c3 { grid-template-columns: repeat(3, 1fr); }
+.cards.c2 { grid-template-columns: repeat(2, 1fr); }
+.card-item { background: var(--white); border-left: 4px solid var(--accent); padding: clamp(.6rem, 2vh, 1.2rem) clamp(.7rem, 1.5vw, 1.2rem); }
+.card-item .n { font-weight: 800; font-size: clamp(.7rem, 1vw, .85rem); color: var(--accent); letter-spacing: .1em; }
+.card-item h3 { font-weight: 800; font-size: clamp(1.05rem, 1.9vw, 1.55rem); line-height: 1.2; margin: .35rem 0; }
+.card-item p { font-size: var(--small-size); color: #4b5163; line-height: 1.5; }
+.card-item p b { color: var(--ink); }
+.card-item.amber { border-left-color: var(--amber); }
+
+/* Tableau des annexes */
+table.annex { width: 100%; border-collapse: collapse; font-size: var(--small-size); background: var(--white); }
+table.annex th { text-align: left; background: var(--dark); color: var(--white); padding: clamp(.35rem, 1vh, .6rem) .7rem; font-weight: 700; }
+table.annex td { padding: clamp(.35rem, 1vh, .6rem) .7rem; border-bottom: 1px solid #e3e6ec; line-height: 1.4; vertical-align: top; }
+table.annex td b { color: var(--accent); }
+
+
+/* Encadre "Pour Camille" : la conclusion metier de chaque test */
+.takeaway { background: var(--white); border-left: 4px solid var(--amber); padding: clamp(.4rem, 1.2vh, .7rem) clamp(.6rem, 1.2vw, 1rem);
+            font-size: var(--small-size); line-height: 1.45; color: #4b5163; }
+.takeaway b { color: var(--ink); }
+.chart.short { height: min(48vh, 470px); }
+.duo { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(.5rem, 1.5vw, 1rem); }
+.duo .chart { height: min(56vh, 540px); }
+/* Numero de slide en bas a droite */
+.num { position: absolute; right: var(--slide-padding); bottom: clamp(.5rem, 2vh, 1.2rem); font-weight: 800; font-size: clamp(.7rem, 1.1vw, .95rem); color: var(--ink); z-index: 5; }
+.num span { color: var(--muted); font-weight: 700; }
+.num.on-dark { color: var(--white); }
+.footer-tag { font-size: clamp(.7rem, 1vw, .9rem); color: var(--muted); }
+
+/* ===========================================
+   SLIDES PLEINE PAGE (titre, transitions)
+   =========================================== */
+.full-dark { background: var(--dark); color: var(--white); }
+.full-dark .slide-content { padding: clamp(1.5rem, 7vw, 7rem); gap: var(--content-gap); }
+.title-main { font-weight: 800; font-size: clamp(2rem, 5.4vw, 4.8rem); line-height: 1; letter-spacing: -.03em; max-width: 18ch; }
+.title-main em { font-style: normal; color: var(--accent); }
+.subtitle { font-size: clamp(1rem, 2vw, 1.6rem); color: #c9cfdc; max-width: 48ch; line-height: 1.5; }
+.meta { display: flex; gap: clamp(1rem, 4vw, 3rem); flex-wrap: wrap; font-size: var(--small-size); color: var(--muted); border-top: 1px solid #2a3245; padding-top: clamp(.6rem, 2vh, 1.2rem); max-width: 60rem; }
+.meta b { color: var(--white); display: block; font-size: clamp(.8rem, 1.3vw, 1rem); }
+.rule { width: clamp(3rem, 8vw, 6rem); height: 5px; background: var(--accent); }
+
+/* Bandeau "Annexe" */
+.annex-badge { display: inline-block; align-self: flex-start; background: var(--amber); color: var(--dark); font-weight: 800; font-size: var(--small-size); padding: .2rem .6rem; letter-spacing: .1em; }
+
+/* ===========================================
+   ANIMATIONS : declenchees par la classe .visible (ajoutee en JS)
+   =========================================== */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s var(--ease-out-expo), transform .6s var(--ease-out-expo); }
+.reveal-left { opacity: 0; transform: translateX(-24px); transition: opacity .6s var(--ease-out-expo), transform .6s var(--ease-out-expo); }
+.slide.visible .reveal, .slide.visible .reveal-left { opacity: 1; transform: none; }
+.slide.visible .d1 { transition-delay: .1s; } .slide.visible .d2 { transition-delay: .2s; }
+.slide.visible .d3 { transition-delay: .3s; } .slide.visible .d4 { transition-delay: .4s; }
+
+/* Navigation par points a droite */
+.nav-dots { position: fixed; right: clamp(.3rem, .8vw, .7rem); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 6px; z-index: 100; }
+.nav-dots button { width: 7px; height: 7px; border-radius: 50%; border: none; background: rgba(139,147,167,.5); cursor: pointer; padding: 0; }
+.nav-dots button.active { background: var(--accent); transform: scale(1.4); }
+
+/* Ecrans etroits : panneaux empiles */
+@media (max-width: 800px) {
+    .split { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .split .left { padding-bottom: 1rem; }
+    .split .left::after { display: none; }
+    .big { font-size: clamp(2.2rem, 12vw, 4rem); }
+    .points { display: none; }
+    .cards.c3, .cards.c2 { grid-template-columns: 1fr; }
+}
+@media (max-height: 650px) { .points li:nth-child(n+3) { display: none; } }
+</style>
+</head>
+<body>
+<div class="progress-bar"></div>
+<nav class="nav-dots" aria-label="Navigation entre les slides"></nav>
+
+<!-- ============ 1. TITRE ============ -->
+<section class="slide full-dark" data-num="01">
+  <div class="slide-content">
+    <div class="rule reveal"></div>
+    <p class="kicker reveal d1">MeloWave · Études musicales</p>
+    <h1 class="title-main reveal d2">Analyser et anticiper les <em>tendances du streaming</em></h1>
+    <p class="subtitle reveal d3">Ce qui rend un morceau populaire aujourd'hui, et la place de la pop dans les six prochains mois.</p>
+    <div class="meta reveal d4">
+      <div><b>Bader B.</b>Data Analyst</div>
+      <div><b>Camille Roussel</b>Directrice des études musicales</div>
+      <div><b>Octobre 2026</b>Soutenance du projet</div>
+    </div>
+  </div>
+  <p class="num on-dark">01 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 2. CONTEXTE ============ -->
+<section class="slide split" data-num="02">
+  <div class="left">
+    <p class="kicker">Contexte</p>
+    <div class="reveal-left">
+      <div class="big">2</div>
+      <p class="big-caption">questions posées par Camille pour conseiller les labels</p>
+    </div>
+    <p class="footer-tag">MeloWave · distributeur musical indépendant</p>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Des recommandations aux labels fondées sur les données, pas sur l'intuition</h1>
+    <div class="cards c2 reveal d1">
+      <div class="card-item"><p class="n">MISSION 1 · PHOTOGRAPHIER</p><h3>Qu'est-ce qui rend un morceau populaire aujourd'hui ?</h3><p>Analyse du catalogue : profils audio, genres, artistes, et trois questions du comité vérifiées par des <b>tests statistiques</b>.</p></div>
+      <div class="card-item amber"><p class="n">MISSION 2 · ANTICIPER</p><h3>La pop va-t-elle monter ou descendre dans six mois ?</h3><p>Suivi de la pop dans le <b>Top 200 mondial</b> de 2017 à 2020 et <b>prévision</b> avec le modèle Prophet.</p></div>
+    </div>
+    <p class="reveal d2" style="font-size:var(--body-size);color:#4b5163;line-height:1.5">Objectif final : un <b>calendrier de sorties plus précis</b>, et savoir quels genres pousser, où et quand.</p>
+  </div>
+  <p class="num">02 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 3. TROIS MESSAGES CLES ============ -->
+<section class="slide split" data-num="03">
+  <div class="left">
+    <p class="kicker">L'essentiel</p>
+    <div class="reveal-left">
+      <div class="big">3</div>
+      <p class="big-caption">messages à retenir, détaillés dans la suite de la présentation</p>
+    </div>
+    <p class="footer-tag">Les preuves suivent, slides 5 à 16</p>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Ce que les labels doivent retenir</h1>
+    <div class="cards reveal d1" style="grid-template-columns:1fr">
+      <div class="card-item"><p class="n">01</p><h3>Le genre fait la popularité, pas le son</h3><p>Le genre explique <b>27&nbsp;%</b> de la popularité d'un morceau ; aucune caractéristique audio n'en explique plus de <b>2&nbsp;%</b>.</p></div>
+      <div class="card-item"><p class="n">02</p><h3>La pop recule, mais Noël reste son temps fort</h3><p>De <b>94 à 74 places</b> du Top 200 mondial entre 2017 et 2020, un recul retrouvé dans <b>32 marchés sur 35</b>. Chaque décembre, elle regagne 26 à 32 places.</p></div>
+      <div class="card-item amber"><p class="n">03</p><h3>La prévision sert à planifier, pas à chiffrer</h3><p>Fiable pour le <b>calendrier</b> et les saisons, elle ne voit pas les <b>retournements</b> de tendance.</p></div>
+    </div>
+  </div>
+  <p class="num">03 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 4. DEMARCHE ============ -->
+<section class="slide split" data-num="04">
+  <div class="left">
+    <p class="kicker">Démarche et données</p>
+    <div class="reveal-left">
+      <div class="big sm">9,8 M</div>
+      <p class="big-caption">millions de lignes de classements quotidiens, 35 marchés, 2017 à 2020</p>
+    </div>
+    <ul class="points">
+      <li>Catalogue : <b>114 000</b> lignes, <b>89 740</b> morceaux distincts, 114 genres</li>
+      <li>Sorties : <b>51 754</b> morceaux datés</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Des données vérifiées avant d'être analysées</h1>
+    <div class="cards c2 reveal d1">
+      <div class="card-item"><p class="n">MISSION 1 · CATALOGUE</p><h3>Audit, description, tests</h3><p>1 ligne incomplète et <b>450 doublons stricts</b> retirés. Base principale : <b>113 549 lignes</b>, une par morceau et par genre, comme le corrigé. Les <b>89 740 morceaux distincts</b> servent aux classements d'artistes et aux analyses complémentaires.</p></div>
+      <div class="card-item amber"><p class="n">MISSION 2 · CLASSEMENTS</p><h3>Série, prévision, évaluation</h3><p>Série quotidienne de la pop dans le Top 200 mondial, <b>5 jours de collecte manquants</b> repérés et traités. Prophet entraîné puis testé sur les <b>90 derniers jours</b>, jamais vus par le modèle.</p></div>
+    </div>
+    <p class="reveal d2 source">Outils : Python, pandas, SciPy, Prophet, Plotly. Notebooks paramétrés : genre et marché se changent en une ligne.</p>
+  </div>
+  <p class="num">04 <span>/ 21</span></p>
+</section>
+
+<!-- ============ CATALOGUE : DISTRIBUTION ============ -->
+<section class="slide split" data-num="05">
+  <div class="left">
+    <p class="kicker">Mission 1 · Catalogue</p>
+    <div class="reveal-left">
+      <div class="big">14&nbsp;%</div>
+      <p class="big-caption">des lignes du catalogue ont une popularité nulle</p>
+    </div>
+    <ul class="points"><li>Popularité médiane : <b>35 sur 100</b>, moyenne 33,3</li><li>Seulement <b>4,8&nbsp;%</b> des lignes dépassent 70</li><li>Base principale : <b>113 549 lignes</b>, une par morceau et par genre, comme le corrigé</li></ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Un catalogue de niche : peu de titres très écoutés, beaucoup de titres confidentiels</h1>
+    <div class="chart reveal d1" data-fig="m1_distribution_popularite"></div>
+    <p class="source">Répartition des 113 549 lignes selon la popularité. En orange : popularité nulle.</p>
+  </div>
+  <p class="num">05 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 5. ARTISTES ============ -->
+<section class="slide split" data-num="06">
+  <div class="left">
+    <p class="kicker">Mission 1 · Catalogue</p>
+    <div class="reveal-left">
+      <div class="big sm">9 / 15</div>
+      <p class="big-caption">artistes du top passent le seuil de 8 morceaux grâce aux doublons, si un morceau compte une fois par genre</p>
+    </div>
+    <ul class="points">
+      <li>Morceau compté une fois : <b>Lil Nas X</b> en tête (82,8 sur 100)</li>
+      <li>Une fois par genre : <b>Måneskin</b> en tête avec 12 lignes, pour <b>5 morceaux réels</b> (en orange : moins de 8 morceaux réels)</li>
+      <li>Seuls <b>6 artistes</b> sur 15 sont communs aux deux classements</li>
+      <li>Les plus gros catalogues (George Jones, 332 morceaux) ne sont pas les plus populaires</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Pour classer les artistes, chaque morceau ne doit compter qu'une fois</h1>
+    <div class="chart reveal d1" data-fig="m1_artistes_populaires"></div>
+    <p class="source">Popularité moyenne des 10 premiers artistes (minimum 8 morceaux). À gauche : morceaux distincts. À droite : une ligne par morceau et par genre, comme dans la base principale.</p>
+  </div>
+  <p class="num">06 <span>/ 21</span></p>
+</section>
+
+<!-- ============ VUE D'ENSEMBLE : MATRICE DE CORRELATION ============ -->
+<section class="slide split" data-num="07">
+  <div class="left">
+    <p class="kicker">Vue d'ensemble · Corrélations</p>
+    <div class="reveal-left">
+      <div class="big">11</div>
+      <p class="big-caption">variables croisées dans la matrice de corrélation, popularité comprise</p>
+    </div>
+    <ul class="points">
+      <li>Liens forts : energy et loudness (<b>0,76</b>), acousticness et energy (<b>-0,73</b>)</li>
+      <li>Popularité : aucune corrélation au-delà de <b>0,1</b> en valeur absolue</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Matrice de corrélation des variables audio et de la popularité</h1>
+    <div class="chart reveal d1" data-fig="annexe_matrice_correlation"></div>
+    <p class="source">Coefficients de Pearson sur la base principale (113 549 lignes). Rouge : lien positif ; bleu : lien négatif.</p>
+  </div>
+  <p class="num">07 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 6. TEST 1 : CORRELATION ============ -->
+<section class="slide split" data-num="08">
+  <div class="left">
+    <p class="kicker">Test 1 · Corrélation</p>
+    <div class="reveal-left">
+      <div class="big">0,75</div>
+      <p class="big-caption">corrélation entre energy et loudness : une relation forte</p>
+    </div>
+    <ul class="points">
+      <li><b>Test : Spearman</b>, car les variables ne suivent pas une loi normale (Shapiro-Wilk)</li>
+      <li>Acousticness et energy : <b>-0,71</b>, relation inverse forte</li>
+      <li>p-value (probabilité que le résultat soit dû au hasard) &lt; 0,001 dans les deux cas</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Energy, loudness et acousticness décrivent la même chose</h1>
+    <div class="chart short reveal d1" data-fig="m1_audio_lie"></div>
+    <p class="takeaway reveal d2"><b>Pour Camille</b> : energy, loudness et acousticness mesurent presque la même chose. Pour décrire un morceau, en suivre une seule suffit ; danceability, valence ou speechiness apportent davantage d'information nouvelle.</p>
+    <p class="source">3 000 morceaux tirés au hasard. Couleur : acousticness. Musique produite et forte en haut à droite, acoustique et calme en bas à gauche.</p>
+  </div>
+  <p class="num">08 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 7. TEST 2 : GENRES ============ -->
+<section class="slide split" data-num="09">
+  <div class="left">
+    <p class="kicker">Test 2 · Comparaison de groupes</p>
+    <div class="reveal-left">
+      <div class="big">27&nbsp;%</div>
+      <p class="big-caption">de la popularité d'un morceau expliquée par son genre</p>
+    </div>
+    <ul class="points">
+      <li><b>Test : Kruskal-Wallis</b>, car la popularité n'est normale dans aucun genre (Shapiro-Wilk par genre)</li>
+      <li>H (statistique du test) = 30 955, p-value (probabilité que le résultat soit dû au hasard) &lt; 0,001 ; l'ANOVA (analyse de la variance) confirme</li>
+      <li>Taille d'effet <b>ε² (epsilon carré) = 0,27</b> : effet fort</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Le genre explique 27&nbsp;% de la popularité d'un morceau</h1>
+    <div class="chart short reveal d1" data-fig="m1_popularite_genres"></div>
+    <p class="takeaway reveal d2"><b>Pour Camille</b> : le genre pèse réellement sur le succès d'un titre. Certains genres sont « à hits », très dispersés, où quelques titres portent tout le genre (pop, hip-hop) ; d'autres sont plus réguliers (chill, pop-film). Le genre est donc un vrai levier de décision.</p>
+    <p class="source">Les 8 genres les moins populaires (gris) et les 8 plus populaires (bleu), classés par popularité médiane.</p>
+  </div>
+  <p class="num">09 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 8. TEST 3 : EXPLICITE ============ -->
+<section class="slide split" data-num="10">
+  <div class="left">
+    <p class="kicker">Test 3 · Association</p>
+    <div class="reveal-left">
+      <div class="big">0,40</div>
+      <p class="big-caption">V de Cramér : une association marquée entre genre et contenu explicite</p>
+    </div>
+    <ul class="points">
+      <li><b>Test : khi²</b>, deux variables qualitatives (genre, explicite oui ou non)</li>
+      <li>khi² = 18 362, 113 degrés de liberté, p-value (probabilité que le résultat soit dû au hasard) &lt; 0,001</li>
+      <li>De <b>0&nbsp;%</b> de titres explicites (world-music) à <b>65,6&nbsp;%</b> (comedy)</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Le contenu explicite dépend fortement du genre</h1>
+    <div class="chart short reveal d1" data-fig="m1_explicite_genres"></div>
+    <p class="takeaway reveal d2"><b>Pour Camille</b> : selon le genre, de 0&nbsp;% à 66&nbsp;% des titres sont explicites. C'est un critère à intégrer pour cibler le public (playlists familiales, radio) et calibrer la modération des recommandations.</p>
+    <p class="source">Part de morceaux explicites : les 8 genres les moins et les 8 plus explicites.</p>
+  </div>
+  <p class="num">10 <span>/ 21</span></p>
+</section>
+
+<!-- ============ PROFILS SONORES PAR GENRE ============ -->
+<section class="slide split" data-num="11">
+  <div class="left">
+    <p class="kicker">Mission 1 · Profils sonores</p>
+    <div class="reveal-left">
+      <div class="big">0,72</div>
+      <p class="big-caption">instrumentalness moyenne du sleep, contre 0,37 pour le drum-and-bass et 0,01 pour la k-pop</p>
+    </div>
+    <ul class="points">
+      <li><b>Sleep</b> : acoustique, sans voix, peu énergique</li>
+      <li><b>Drum-and-bass</b> : énergie maximale (0,88), production électronique</li>
+      <li><b>K-pop</b> : la plus dansante et la plus positive, chantée</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Trois genres, trois profils sonores bien distincts</h1>
+    <div class="chart reveal d1" data-fig="annexe_radar_genres"></div>
+    <p class="source">Moyenne des variables comprises entre 0 et 1, base principale. La présence ou l'absence de voix (instrumentalness) sépare le mieux les genres.</p>
+  </div>
+  <p class="num">11 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 9. GENRE CONTRE SON ============ -->
+<section class="slide split" data-num="12">
+  <div class="left">
+    <p class="kicker">Mission 1 · Conclusion</p>
+    <div class="reveal-left">
+      <div class="big amber">× 17</div>
+      <p class="big-caption">le genre pèse 17 fois plus que la meilleure variable audio</p>
+    </div>
+    <ul class="points">
+      <li>Meilleure variable audio : <b>instrumentalness</b>, avec r (coefficient de corrélation) = -0,13 ; absente de la demande initiale</li>
+      <li>Le son ne fait pas le succès ; le genre, l'artiste et la promotion, si</li>
+      <li><b>D'où la Mission 2</b> : suivre un genre dans le temps</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Le profil sonore n'explique pas la popularité, le genre si</h1>
+    <div class="chart reveal d1" data-fig="m1_genre_contre_son"></div>
+    <p class="source">Part de la popularité expliquée : ε² (epsilon carré, taille d'effet) pour le genre, r² (carré du coefficient de corrélation) pour les 5 variables audio les plus liées (morceaux distincts).</p>
+  </div>
+  <p class="num">12 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 10. SERIE POP ============ -->
+<section class="slide split" data-num="13">
+  <div class="left">
+    <p class="kicker">Mission 2 · La pop dans le temps</p>
+    <div class="reveal-left">
+      <div class="big sm">94 → 74</div>
+      <p class="big-caption">places moyennes de la pop dans le Top 200 mondial, de 2017 à 2020</p>
+    </div>
+    <ul class="points">
+      <li>Chaque décembre : <b>+26 à +32 places</b>, portées par les titres de Noël</li>
+      <li>Point bas : <b>61 places</b> le 23 juillet 2020</li>
+      <li>Fin de série en reprise : <b>79 places</b> début novembre 2020</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">La pop recule dans le Top 200 mondial, sauf à Noël</h1>
+    <div class="chart reveal d1" data-fig="m2_serie_pop"></div>
+    <p class="source">Nombre de morceaux pop dans le Top 200 mondial, chaque jour (gris) et en moyenne mobile sur 30 jours (bleu).</p>
+  </div>
+  <p class="num">13 <span>/ 21</span></p>
+</section>
+
+<!-- ============ SAISONNALITE ============ -->
+<section class="slide split" data-num="14">
+  <div class="left">
+    <p class="kicker">Mission 2 · Saisonnalité</p>
+    <div class="reveal-left">
+      <div class="big sm">17/12</div>
+      <p class="big-caption">pic annuel de la pop, porté par les titres de Noël</p>
+    </div>
+    <ul class="points"><li>Creux autour du <b>28 septembre</b> (-8,9 morceaux) : la rentrée profite au rap et au latin</li><li>Vendredi <b>-1,7</b>, samedi <b>-2,1</b> : le jour des sorties, les nouveautés des autres genres repoussent la pop</li><li>Le hip hop gagne <b>3,3 places</b> le vendredi</li></ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">La pop a ses rythmes : Noël en haut, la rentrée et le week-end en bas</h1>
+    <div class="chart reveal d1" data-fig="m2_composantes"></div>
+    <p class="source">Composantes saisonnières estimées par Prophet (effet annuel montré sur 2019). Jours de sortie en orange.</p>
+  </div>
+  <p class="num">14 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 11. QUALITE DE LA PREVISION ============ -->
+<section class="slide split" data-num="15">
+  <div class="left">
+    <p class="kicker">Mission 2 · Évaluation</p>
+    <div class="reveal-left">
+      <div class="big">24&nbsp;%</div>
+      <p class="big-caption">d'erreur : MAPE (erreur moyenne en pourcentage) sur les 90 jours de test</p>
+    </div>
+    <ul class="points">
+      <li>MAE (erreur absolue moyenne) <b>18,3</b> morceaux par jour, RMSE (racine de l'erreur quadratique moyenne) <b>19,6</b></li>
+      <li><b>90 jours sur 90 sous-estimés</b> : une erreur systématique, pas du hasard</li>
+      <li>Le modèle prolonge la baisse, alors que la pop repart dès le 23 juillet</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Le modèle retrouve le rythme, mais rate les retournements</h1>
+    <div class="chart reveal d1" data-fig="m2_test"></div>
+    <p class="source">Réel (noir) contre prévu (bleu pointillé) sur la période de test, du 8 août au 5 novembre 2020.</p>
+  </div>
+  <p class="num">15 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 12. PREVISION 6 MOIS ============ -->
+<section class="slide split" data-num="16">
+  <div class="left">
+    <p class="kicker">Mission 2 · Prévision</p>
+    <div class="reveal-left">
+      <div class="big">74</div>
+      <p class="big-caption">places en moyenne prévues pour la pop, de novembre 2020 à mai 2021</p>
+    </div>
+    <ul class="points">
+      <li>Pic de Noël : <b>78 places</b>, puis lent recul jusqu'à 67 en mai</li>
+      <li>Départ <b>probablement trop bas</b> : 75 prévus contre 86 réels</li>
+      <li>Incertitude croissante : intervalle de <b>12,7</b> à <b>18,5</b> morceaux</li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Dans six mois : environ 74 places, avec un pic à Noël</h1>
+    <div class="chart reveal d1" data-fig="m2_prevision"></div>
+    <p class="source">Réel depuis novembre 2019 (noir), prévision (bleu) et intervalle de confiance à 80&nbsp;%.</p>
+  </div>
+  <p class="num">16 <span>/ 21</span></p>
+</section>
+
+<!-- ============ SORTIES ============ -->
+<section class="slide split" data-num="17">
+  <div class="left">
+    <p class="kicker">Mission 2 · Cadence des sorties</p>
+    <div class="reveal-left">
+      <div class="big">454</div>
+      <p class="big-caption">sorties pop en moyenne en novembre, contre 239 en décembre</p>
+    </div>
+    <ul class="points"><li>Décembre : peu de nouveautés, mais le plus de pop classée : le pic de Noël vient des <b>classiques</b></li><li>Prévision des sorties : MAPE (erreur moyenne en pourcentage) <b>21&nbsp;%</b>, 4 mois sur 6 à 14 sorties près</li><li>Octobre 2020 sous-estimé d'environ 10&nbsp;% (collecte arrêtée, annexe A4)</li></ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Les labels sortent leur pop en novembre, pas en décembre</h1>
+    <div class="chart reveal d1" data-fig="m2_sorties_mois"></div>
+    <p class="source">Moyenne mensuelle des sorties pop entrées dans les classements, 2017 à 2020.</p>
+  </div>
+  <p class="num">17 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 13. MARCHES ============ -->
+<section class="slide split" data-num="18">
+  <div class="left">
+    <p class="kicker">Mission 2 · Comparaison des marchés</p>
+    <div class="reveal-left">
+      <div class="big sm">32 / 35</div>
+      <p class="big-caption">marchés où la part de la pop recule entre 2017 et 2020</p>
+    </div>
+    <ul class="points">
+      <li>Dans <b>16 marchés</b>, la pop n'est plus le premier genre : latin, hip hop, rap</li>
+      <li>Points forts : <b>Asie du Sud-Est</b> et <b>Nord de l'Europe</b></li>
+      <li>Vigilance : en France, l'étiquette « indie » regroupe des <b>rappeurs</b></li>
+    </ul>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Le recul de la pop se retrouve presque partout</h1>
+    <div class="chart tall reveal d1" data-fig="m2_marches"></div>
+    <p class="source">Évolution de la part de la pop, janvier à octobre 2017 contre 2020. Classement mondial en orange.</p>
+  </div>
+  <p class="num">18 <span>/ 21</span></p>
+</section>
+
+<!-- ============ CONCLUSION ============ -->
+<section class="slide split" data-num="19">
+  <div class="left">
+    <p class="kicker">Conclusion</p>
+    <div class="reveal-left">
+      <div class="big">2</div>
+      <p class="big-caption">questions posées par Camille, deux réponses appuyées par les données</p>
+    </div>
+    <p class="footer-tag">MeloWave · Études musicales</p>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Le genre fait le succès ; la pop recule, mais garde Noël</h1>
+    <div class="cards c2 reveal d1">
+      <div class="card-item"><p class="n">QUESTION 1 · AUJOURD'HUI</p><h3>Qu'est-ce qui rend un morceau populaire ?</h3><p>Son <b>genre</b>, qui explique 27&nbsp;% de sa popularité. Le profil sonore en explique moins de 2&nbsp;% : il décrit la musique, il ne prédit pas le succès.</p></div>
+      <div class="card-item"><p class="n">QUESTION 2 · DANS SIX MOIS</p><h3>Où va la pop ?</h3><p>Environ <b>74 places</b> du Top 200 mondial, avec un pic à Noël. Une tendance au recul, partagée par 32 marchés sur 35, mais une prévision sans doute trop basse au départ.</p></div>
+      <div class="card-item amber"><p class="n">LIMITES</p><h3>Ce que l'étude ne dit pas</h3><p>Une seule prévision (pop, classement mondial), des données arrêtées fin 2020, année atypique, et des étiquettes de genre parfois trompeuses (le rap classé « indie » en France).</p></div>
+      <div class="card-item amber"><p class="n">PISTES</p><h3>Pour aller plus loin</h3><p>Relancer l'analyse sur d'autres genres et marchés (une ligne à changer), ajouter des données d'<b>artistes</b> et de <b>promotion</b>, qui expliquent sans doute une grande part du succès.</p></div>
+    </div>
+  </div>
+  <p class="num">19 <span>/ 21</span></p>
+</section>
+
+<!-- ============ 14. RECOMMANDATIONS ============ -->
+<section class="slide split" data-num="20">
+  <div class="left">
+    <p class="kicker">Recommandations</p>
+    <div class="reveal-left">
+      <div class="big amber">4</div>
+      <p class="big-caption">actions pour les labels</p>
+    </div>
+    <p class="footer-tag">MeloWave · Études musicales</p>
+  </div>
+  <div class="right">
+    <h1 class="reveal">Ce que les labels peuvent faire dès maintenant</h1>
+    <div class="cards c2 reveal d1">
+      <div class="card-item"><p class="n">CALENDRIER</p><h3>Sortir les nouveautés pop avant décembre</h3><p>En décembre, les classiques de Noël occupent la place. Une sortie <b>début novembre</b> a le temps de s'installer : 84&nbsp;% des titres pop classés entrent dans le Top 200 dans la semaine de leur sortie.</p></div>
+      <div class="card-item"><p class="n">CHOIX ARTISTIQUES</p><h3>Raisonner par genre, pas par profil sonore</h3><p>Le genre explique <b>27&nbsp;%</b> de la popularité, le son moins de 2&nbsp;%. Chercher un « son à succès » est une fausse piste.</p></div>
+      <div class="card-item"><p class="n">MARCHÉS</p><h3>Cibler où la pop résiste</h3><p>Asie du Sud-Est, Nord de l'Europe. Ailleurs, la musique <b>latine</b> et le <b>hip hop</b> ont pris la tête.</p></div>
+      <div class="card-item amber"><p class="n">PILOTAGE</p><h3>Planifier avec la prévision, vérifier chaque semaine</h3><p>La prévision fixe le calendrier ; un <b>suivi hebdomadaire</b> des classements repère à temps un retournement.</p></div>
+    </div>
+  </div>
+  <p class="num">20 <span>/ 21</span></p>
+</section>
+
+<!-- ============ MERCI ============ -->
+<section class="slide full-dark" data-num="21">
+  <div class="slide-content">
+    <div class="rule reveal"></div>
+    <p class="kicker reveal d1">MeloWave · Études musicales</p>
+    <h1 class="title-main reveal d2">Merci.<br><em>Vos questions ?</em></h1>
+    <p class="subtitle reveal d3">Les annexes A1 à A7 détaillent les conditions des tests, la taille d'effet, le diagnostic des données, la cadence des sorties, la réutilisation de l'analyse et la lecture des indicateurs d'erreur.</p>
+    <div class="meta reveal d4">
+      <div><b>Bader B.</b>Data Analyst</div>
+      <div><b>2 notebooks</b>Catalogue et prévision</div>
+      <div><b>Octobre 2026</b>Soutenance du projet</div>
+    </div>
+  </div>
+  <p class="num on-dark">21 <span>/ 21</span></p>
+</section>
+
+<!-- ============ ANNEXES ============ -->
+<section class="slide split" data-num="A1">
+  <div class="left">
+    <span class="annex-badge">ANNEXE A1</span>
+    <div><div class="big">3</div><p class="big-caption">tests, chacun choisi après vérification de ses conditions</p></div>
+    <p class="footer-tag">Mission 1</p>
+  </div>
+  <div class="right">
+    <h2>Conditions d'utilisation des tests</h2>
+    <table class="annex">
+      <tr><th>Question</th><th>Condition vérifiée</th><th>Résultat</th><th>Test retenu</th></tr>
+      <tr><td>Energy et loudness sont-elles liées ?</td><td>Normalité des deux variables (Shapiro-Wilk)</td><td>Rejetée</td><td><b>Spearman</b> (Pearson donne 0,76, quasi identique)</td></tr>
+      <tr><td>La popularité diffère-t-elle selon le genre ?</td><td>Normalité <b>dans chaque genre</b> (Shapiro-Wilk), règle de décision codée</td><td>Rejetée dans tous les genres</td><td><b>Kruskal-Wallis</b>, ANOVA (analyse de la variance) en contrôle, test de Dunn pour les paires</td></tr>
+      <tr><td>Le contenu explicite dépend-il du genre ?</td><td>Effectifs attendus suffisants dans le tableau de contingence</td><td>Respectée (1 000 morceaux par genre)</td><td><b>Khi²</b>, avec le V de Cramér</td></tr>
+    </table>
+  </div>
+  <p class="num">A1</p>
+</section>
+
+<section class="slide split" data-num="A2">
+  <div class="left">
+    <span class="annex-badge">ANNEXE A2</span>
+    <div><div class="big sm">0,1&nbsp;%</div><p class="big-caption">de la popularité expliquée par danceability, un lien pourtant « très significatif »</p></div>
+    <p class="footer-tag">Mission 1</p>
+  </div>
+  <div class="right">
+    <h2>Significativité statistique contre taille d'effet</h2>
+    <div class="cards c2">
+      <div class="card-item"><p class="n">LA P-VALUE</p><h3>Dit si un effet existe</h3><p>Avec <b>113 549 lignes</b>, le moindre écart devient significatif. Danceability et popularité : r (coefficient de corrélation) = 0,034, et pourtant <b>p-value = 4 × 10⁻³¹</b>.</p></div>
+      <div class="card-item amber"><p class="n">LA TAILLE D'EFFET</p><h3>Dit si l'effet compte</h3><p>r = 0,034 explique 0,1&nbsp;% de la popularité : <b>négligeable</b>. C'est la taille d'effet qui guide une décision métier.</p></div>
+    </div>
+    <table class="annex">
+      <tr><th>Indicateur</th><th>Faible</th><th>Moyen</th><th>Fort</th><th>Dans ce projet</th></tr>
+      <tr><td>r (corrélation)</td><td>0,1</td><td>0,3</td><td>0,5</td><td>energy et loudness : <b>0,75</b></td></tr>
+      <tr><td>ε² (epsilon carré, Kruskal-Wallis)</td><td>0,01</td><td>0,06</td><td>0,14</td><td>genre : <b>0,27</b></td></tr>
+      <tr><td>V de Cramér</td><td>0,1</td><td>0,3</td><td>0,5</td><td>explicite et genre : <b>0,40</b></td></tr>
+    </table>
+  </div>
+  <p class="num">A2</p>
+</section>
+
+<section class="slide split" data-num="A3">
+  <div class="left">
+    <span class="annex-badge">ANNEXE A3</span>
+    <div><div class="big">5</div><p class="big-caption">jours sans donnée exploitable sur 1 405, aucun vrai zéro</p></div>
+    <p class="footer-tag">Mission 2</p>
+  </div>
+  <div class="right">
+    <h2>Diagnostic des jours à zéro</h2>
+    <table class="annex">
+      <tr><th>Cas</th><th>Comment le repérer</th><th>Jours</th><th>Traitement</th></tr>
+      <tr><td><b>Trou de collecte</b></td><td>Aucun classement ce jour-là</td><td>4 (février à juin 2017)</td><td>Valeur manquante</td></tr>
+      <tr><td><b>Trou de collecte déguisé</b></td><td>200 lignes vides (titre « N\A », aucun genre) : la règle « classement absent » ne le voit pas</td><td>1 (9 juin 2018)</td><td>Valeur manquante</td></tr>
+      <tr><td><b>Vrai zéro</b></td><td>Classement complet, mais aucun morceau pop</td><td>0</td><td>Aurait été conservé à 0</td></tr>
+    </table>
+    <p class="source">Les dates absentes sont d'abord réinsérées dans une grille complète, sinon elles disparaîtraient sans bruit. Prophet gère nativement les valeurs manquantes.</p>
+  </div>
+  <p class="num">A3</p>
+</section>
+
+<section class="slide split" data-num="A4">
+  <div class="left">
+    <span class="annex-badge">ANNEXE A4</span>
+    <div><div class="big sm">0 jour</div><p class="big-caption">délai médian entre la sortie d'un titre pop et son entrée dans le Top 200</p></div>
+    <p class="footer-tag">Mission 2</p>
+  </div>
+  <div class="right">
+    <h2>Cadence mensuelle des sorties et biais de troncature</h2>
+    <div class="cards c3">
+      <div class="card-item"><p class="n">PRÉVISION</p><h3>21&nbsp;% d'erreur</h3><p>MAPE (erreur moyenne en pourcentage) 21&nbsp;%, MAE (erreur absolue moyenne) 47,9 sorties par mois, RMSE (racine de l'erreur quadratique moyenne) 79,5. Quatre mois sur six à 14 sorties près ; l'erreur vient de <b>juin</b> (399 prévues, 222 réelles) et <b>août</b>.</p></div>
+      <div class="card-item"><p class="n">TRONCATURE</p><h3>Limitée</h3><p>84&nbsp;% des titres classés y entrent dans la semaine, 90&nbsp;% dans le mois. Seul <b>octobre 2020</b> est sous-estimé, d'environ 10&nbsp;%.</p></div>
+      <div class="card-item amber"><p class="n">À RETENIR</p><h3>Décembre, peu de sorties</h3><p>Décembre compte peu de sorties pop mais le plus de pop classée : le pic de Noël vient des <b>classiques</b>, pas des nouveautés.</p></div>
+    </div>
+    <p class="source">La série ne compte que les sorties entrées dans les classements, pas toute la production du genre.</p>
+  </div>
+  <p class="num">A4</p>
+</section>
+
+<section class="slide split" data-num="A5">
+  <div class="left">
+    <span class="annex-badge">ANNEXE A5</span>
+    <div><div class="big sm">9 / 15</div><p class="big-caption">artistes du top passeraient le seuil grâce aux doublons</p></div>
+    <p class="footer-tag">Mission 1</p>
+  </div>
+  <div class="right">
+    <h2>Pourquoi compter chaque morceau une seule fois dans les classements</h2>
+    <table class="annex">
+      <tr><th>Artiste</th><th>Morceaux comptés (une ligne par genre)</th><th>Morceaux réels</th></tr>
+      <tr><td>Måneskin, 1er du classement sinon</td><td>12</td><td><b>5</b></td></tr>
+      <tr><td>ROSALÍA</td><td>11</td><td><b>5</b></td></tr>
+      <tr><td>LISA</td><td>10</td><td><b>4</b></td></tr>
+      <tr><td>George Ezra</td><td>23</td><td><b>8</b></td></tr>
+      <tr><td>TWICE (témoin, un genre par titre)</td><td>17</td><td><b>17</b></td></tr>
+    </table>
+    <p class="source">Règle appliquée : une ligne par couple morceau et genre pour les analyses où le genre est étudié (statistiques, tests) ; une ligne par morceau pour les classements, sinon le seuil de 8 morceaux ne filtre plus rien.</p>
+  </div>
+  <p class="num">A5</p>
+</section>
+
+<section class="slide split" data-num="A6">
+  <div class="left">
+    <span class="annex-badge">ANNEXE A6</span>
+    <div><div class="big">1</div><p class="big-caption">ligne à modifier pour relancer l'analyse sur un autre genre ou marché</p></div>
+    <p class="footer-tag">Méthodologie</p>
+  </div>
+  <div class="right">
+    <h2>Réutiliser l'analyse, et usage de l'IA (intelligence artificielle)</h2>
+    <div class="cards c2">
+      <div class="card-item"><p class="n">RÉUTILISABILITÉ</p><h3>Un notebook paramétré</h3><p><b>GENRE = 'pop'</b> et <b>MARCHE = 'Global'</b> en tête du notebook : tout se recalcule, chiffres et graphiques. Graine aléatoire fixée pour des résultats reproductibles.</p></div>
+      <div class="card-item amber"><p class="n">USAGE DE L'IA</p><h3>Un assistant, pas un substitut</h3><p>Aide à la <b>syntaxe</b> et à la relecture. Le choix des tests, la lecture des résultats et les conclusions sont vérifiés sur les sorties réelles et assumés à l'oral.</p></div>
+    </div>
+  </div>
+  <p class="num">A6</p>
+</section>
+
+<section class="slide split" data-num="A7">
+  <div class="left">
+    <span class="annex-badge">ANNEXE A7</span>
+    <div><div class="big sm">90 jours</div><p class="big-caption">mis de côté pour le test, jamais vus par le modèle pendant l'entraînement</p></div>
+    <p class="footer-tag">Mission 2</p>
+  </div>
+  <div class="right">
+    <h2>Découpage entraînement / test et lecture des indicateurs</h2>
+    <table class="annex">
+      <tr><th>Indicateur</th><th>Ce qu'il mesure</th><th>Pop, chaque jour</th><th>Sorties, chaque mois</th></tr>
+      <tr><td>MAE (erreur absolue moyenne)</td><td>L'erreur moyenne, dans l'unité de la série</td><td><b>18,3</b> morceaux</td><td><b>47,9</b> sorties</td></tr>
+      <tr><td>RMSE (racine de l'erreur quadratique moyenne)</td><td>Pénalise les grosses erreurs : à comparer à la MAE</td><td><b>19,6</b>, proche de la MAE : erreur régulière</td><td><b>79,5</b>, bien au-dessus : deux grosses erreurs (juin, août)</td></tr>
+      <tr><td>MAPE (erreur moyenne en pourcentage)</td><td>L'erreur relative ; instable si le réel approche de 0</td><td><b>24,1&nbsp;%</b>, fiable : la pop ne descend jamais près de 0</td><td><b>20,8&nbsp;%</b></td></tr>
+    </table>
+    <div class="cards c2">
+      <div class="card-item"><p class="n">DÉCOUPAGE</p><h3>Le test vient après l'entraînement</h3><p>Entraînement du 01/01/2017 au 07/08/2020, test du 08/08 au 05/11/2020, ordre vérifié dans le code. Choisir un réglage d'après le test reviendrait à s'en servir pour entraîner.</p></div>
+      <div class="card-item amber"><p class="n">RÉGLAGE</p><h3>L'erreur ne vient pas du réglage</h3><p>Autoriser des ruptures de tendance plus récentes (changepoint_range 0,9 et 0,95) ne fait pas mieux : MAE de 19,2 à 19,4. La reprise commence deux semaines avant la fin de l'entraînement, trop tard pour être vue.</p></div>
+    </div>
+  </div>
+  <p class="num">A7</p>
+</section>
+
+
+<!-- ============ PLOTLY (bibliotheque embarquee) ============ -->
+<script>/*PLOTLY_JS*/</script>
+<script>
+/* ===========================================
+   FIGURES : JSON produits par build_figures.py
+   =========================================== */
+const FIGURES = /*FIGURES_JSON*/;
+
+/* ===========================================
+   CONTROLEUR DE PRESENTATION
+   =========================================== */
+class SlidePresentation {
+    constructor() {
+        this.slides = [...document.querySelectorAll('.slide')];
+        this.current = 0;
+        this.drawn = new Set();
+        this.setupObserver();
+        this.setupNavDots();
+        this.setupKeyboard();
+        this.setupTouch();
+        window.addEventListener('scroll', () => this.updateProgress(), { passive: true });
+        window.addEventListener('resize', () => document.querySelectorAll('.chart.drawn').forEach(el => Plotly.Plots.resize(el)));
+    }
+
+    /* Ajoute .visible a la slide affichee et dessine ses graphiques a la premiere apparition */
+    setupObserver() {
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                e.target.classList.add('visible');
+                this.current = this.slides.indexOf(e.target);
+                this.updateDots();
+                e.target.querySelectorAll('.chart[data-fig]').forEach(el => this.draw(el));
+            });
+        }, { threshold: 0.5 });
+        this.slides.forEach(s => obs.observe(s));
+    }
+
+    draw(el) {
+        if (el.classList.contains('drawn')) return;
+        const fig = FIGURES[el.dataset.fig];
+        if (!fig) return;
+        fig.layout.autosize = true;
+        Plotly.newPlot(el, fig.data, fig.layout, { displayModeBar: false, responsive: true });
+        el.classList.add('drawn');
+    }
+
+    goTo(i) {
+        i = Math.max(0, Math.min(this.slides.length - 1, i));
+        this.slides[i].scrollIntoView({ behavior: 'smooth' });
+    }
+
+    setupKeyboard() {
+        document.addEventListener('keydown', e => {
+            if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); this.goTo(this.current + 1); }
+            if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); this.goTo(this.current - 1); }
+            if (e.key === 'Home') this.goTo(0);
+            if (e.key === 'End') this.goTo(this.slides.length - 1);
+        });
+    }
+
+    setupTouch() {
+        let y0 = null;
+        document.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive: true });
+        document.addEventListener('touchend', e => {
+            if (y0 === null) return;
+            const dy = y0 - e.changedTouches[0].clientY;
+            if (Math.abs(dy) > 50) this.goTo(this.current + (dy > 0 ? 1 : -1));
+            y0 = null;
+        });
+    }
+
+    setupNavDots() {
+        this.dots = document.querySelector('.nav-dots');
+        this.dots.innerHTML = '';
+        this.slides.forEach((s, i) => {
+            const b = document.createElement('button');
+            b.setAttribute('aria-label', 'Slide ' + s.dataset.num);
+            b.title = s.dataset.num;
+            b.addEventListener('click', () => this.goTo(i));
+            this.dots.appendChild(b);
+        });
+    }
+
+    updateDots() {
+        [...this.dots.children].forEach((d, i) => d.classList.toggle('active', i === this.current));
+    }
+
+    updateProgress() {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        document.querySelector('.progress-bar').style.width = (max > 0 ? window.scrollY / max * 100 : 0) + '%';
+    }
+}
+
+new SlidePresentation();
+</script>
+</body>
+</html>
